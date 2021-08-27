@@ -22,8 +22,7 @@ mkdir -p $LIB
 # install conda env
 conda create --name xtreme --file conda-env.txt
 conda init bash
-#conda activate xtreme
-source activate xtreme
+conda activate xtreme
 
 # install latest transformer
 cd $LIB
