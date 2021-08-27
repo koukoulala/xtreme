@@ -14,3 +14,4 @@ nohup python -u examples/pytorch/text-classification/run_xlm_roberta_xnli.py  --
 
 nohup bash ./scripts/train_xnli.sh xlm-roberta-large 1 &> logs/try.out &
 CUDA_VISIBLE_DEVICES=1 nohup bash ./scripts/train_xnli_2.sh "joeddav/xlm-roberta-large-xnli" 1 &> logs/try_2.out &
+
