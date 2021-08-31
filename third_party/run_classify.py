@@ -619,6 +619,9 @@ def main():
   parser.add_argument("--local_rank", type=int, default=-1, help="For distributed training: local_rank")
   parser.add_argument("--server_ip", type=str, default="", help="For distant debugging.")
   parser.add_argument("--server_port", type=str, default="", help="For distant debugging.")
+
+  parser.add_argument("--do_first_eval", action="store_true", help="Whether to run eval on the test set.")
+
   args = parser.parse_args()
 
   if (
@@ -752,6 +755,16 @@ def main():
     model = model_class.from_pretrained(args.output_dir)
     tokenizer = tokenizer_class.from_pretrained(args.output_dir)
     model.to(args.device)
+
+  if args.do_first_eval and os.path.exists(args.cache_dir):
+    model = model_class.from_pretrained(
+      args.model_name_or_path,
+      cache_dir=args.cache_dir if args.cache_dir else None)
+
+    model.to(args.device)
+    result = evaluate(args, model, tokenizer, split='dev', language=args.train_language, lang2id=lang2id, prefix="")
+    print(result)
+
 
   # Evaluation
   results = {}

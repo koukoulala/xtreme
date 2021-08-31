@@ -1,0 +1,225 @@
+nohup: ignoring input
+08/27/2021 09:08:22 - INFO - root -   Input args: Namespace(adam_epsilon=1e-08, cache_dir='../ckpt/xlm-roberta-large-xnli', config_name='', data_dir='/home/work/xiaoyu/xtreme/download//xnli', do_eval=True, do_first_eval=True, do_lower_case=False, do_predict=True, do_predict_dev=False, do_train=False, eval_all_checkpoints=True, eval_test_set=True, evaluate_during_training=False, fp16=False, fp16_opt_level='O1', gradient_accumulation_steps=16, init_checkpoint=None, learning_rate=3e-05, local_rank=-1, log_file='train', logging_steps=50, max_grad_norm=1.0, max_seq_length=128, max_steps=-1, model_name_or_path='joeddav/xlm-roberta-large-xnli', model_type='xlmr', no_cuda=False, num_train_epochs=5.0, output_dir='/home/work/xiaoyu/xtreme/outputs//xnli/joeddav/xlm-roberta-large-xnli-LR3e-5-epoch5-MaxLen128//', overwrite_cache=False, overwrite_output_dir=True, per_gpu_eval_batch_size=8, per_gpu_train_batch_size=2, predict_languages='ar,bg,de,el,en,es,fr,hi,ru,sw,th,tr,ur,vi,zh', save_only_best_checkpoint=True, save_steps=100, seed=42, server_ip='', server_port='', task_name='xnli', test_split='test', tokenizer_name='', train_language='en', train_split='train', warmup_steps=0, weight_decay=0.0)
+08/27/2021 09:08:22 - WARNING - __main__ -   Process rank: -1, device: cuda, n_gpu: 1, distributed training: False, 16-bits training: False
+08/27/2021 09:08:23 - INFO - transformers.configuration_utils -   loading configuration file https://s3.amazonaws.com/models.huggingface.co/bert/joeddav/xlm-roberta-large-xnli/config.json from cache at ../ckpt/xlm-roberta-large-xnli/feb713a8e34025aeef902ec8ff39a14eb0e15b424f824fe73e270962f7751ada.0b1c551c41092b888f61f023ebf36b8344fdb39e6fbe47d8fd9418fc6323d315
+08/27/2021 09:08:23 - INFO - transformers.configuration_utils -   Model config XLMRobertaConfig {
+  "architectures": [
+    "XLMRobertaForSequenceClassification"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bos_token_id": 0,
+  "do_sample": false,
+  "eos_token_id": 2,
+  "eos_token_ids": 0,
+  "finetuning_task": "xnli",
+  "gradient_checkpointing": false,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 1024,
+  "id2label": {
+    "0": "contradiction",
+    "1": "neutral",
+    "2": "entailment"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 4096,
+  "is_decoder": false,
+  "label2id": {
+    "contradiction": 0,
+    "entailment": 2,
+    "neutral": 1
+  },
+  "layer_norm_eps": 1e-05,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 514,
+  "model_type": "xlm-roberta",
+  "num_attention_heads": 16,
+  "num_beams": 1,
+  "num_hidden_layers": 24,
+  "num_labels": 3,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 1,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 1,
+  "use_bfloat16": false,
+  "vocab_size": 250002
+}
+
+08/27/2021 09:08:23 - INFO - __main__ -   config = XLMRobertaConfig {
+  "architectures": [
+    "XLMRobertaForSequenceClassification"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bos_token_id": 0,
+  "do_sample": false,
+  "eos_token_id": 2,
+  "eos_token_ids": 0,
+  "finetuning_task": "xnli",
+  "gradient_checkpointing": false,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 1024,
+  "id2label": {
+    "0": "contradiction",
+    "1": "neutral",
+    "2": "entailment"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 4096,
+  "is_decoder": false,
+  "label2id": {
+    "contradiction": 0,
+    "entailment": 2,
+    "neutral": 1
+  },
+  "layer_norm_eps": 1e-05,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 514,
+  "model_type": "xlm-roberta",
+  "num_attention_heads": 16,
+  "num_beams": 1,
+  "num_hidden_layers": 24,
+  "num_labels": 3,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 1,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 1,
+  "use_bfloat16": false,
+  "vocab_size": 250002
+}
+
+08/27/2021 09:08:23 - INFO - transformers.tokenization_utils -   Model name 'joeddav/xlm-roberta-large-xnli' not found in model shortcut name list (xlm-roberta-base, xlm-roberta-large, xlm-roberta-large-finetuned-conll02-dutch, xlm-roberta-large-finetuned-conll02-spanish, xlm-roberta-large-finetuned-conll03-english, xlm-roberta-large-finetuned-conll03-german). Assuming 'joeddav/xlm-roberta-large-xnli' is a path, a model identifier, or url to a directory containing tokenizer files.
+08/27/2021 09:08:26 - INFO - transformers.tokenization_utils -   loading file https://s3.amazonaws.com/models.huggingface.co/bert/joeddav/xlm-roberta-large-xnli/sentencepiece.bpe.model from cache at ../ckpt/xlm-roberta-large-xnli/eb29b7ee6690fcc26cf4a2ef02a77f06ec10aa1c775653236306bdd472323a94.309f0c29486cffc28e1e40a2ab0ac8f500c203fe080b95f820aa9cb58e5b84ed
+08/27/2021 09:08:26 - INFO - transformers.tokenization_utils -   loading file https://s3.amazonaws.com/models.huggingface.co/bert/joeddav/xlm-roberta-large-xnli/added_tokens.json from cache at None
+08/27/2021 09:08:26 - INFO - transformers.tokenization_utils -   loading file https://s3.amazonaws.com/models.huggingface.co/bert/joeddav/xlm-roberta-large-xnli/special_tokens_map.json from cache at ../ckpt/xlm-roberta-large-xnli/7fef4f47d6cd8ee1cda955cc6999e48be7ff3ccd0e5f25e1e0923e52efb147b6.16f949018cf247a2ea7465a74ca9a292212875e5fd72f969e0807011e7f192e4
+08/27/2021 09:08:26 - INFO - transformers.tokenization_utils -   loading file https://s3.amazonaws.com/models.huggingface.co/bert/joeddav/xlm-roberta-large-xnli/tokenizer_config.json from cache at ../ckpt/xlm-roberta-large-xnli/372801c68dd69262c068594fe8161de0d85452c50842ed1e09db892f2b8980ff.70b5dbd5d3b9b4c9bfb3d1f6464291ff52f6a8d96358899aa3834e173b45092d
+08/27/2021 09:08:28 - INFO - __main__ -   lang2id = None
+08/27/2021 09:08:28 - INFO - __main__ -   Training/evaluation parameters Namespace(adam_epsilon=1e-08, cache_dir='../ckpt/xlm-roberta-large-xnli', config_name='', data_dir='/home/work/xiaoyu/xtreme/download//xnli', device=device(type='cuda'), do_eval=True, do_first_eval=True, do_lower_case=False, do_predict=True, do_predict_dev=False, do_train=False, eval_all_checkpoints=True, eval_test_set=True, evaluate_during_training=False, fp16=False, fp16_opt_level='O1', gradient_accumulation_steps=16, init_checkpoint=None, learning_rate=3e-05, local_rank=-1, log_file='train', logging_steps=50, max_grad_norm=1.0, max_seq_length=128, max_steps=-1, model_name_or_path='joeddav/xlm-roberta-large-xnli', model_type='xlmr', n_gpu=1, no_cuda=False, num_train_epochs=5.0, output_dir='/home/work/xiaoyu/xtreme/outputs//xnli/joeddav/xlm-roberta-large-xnli-LR3e-5-epoch5-MaxLen128//', output_mode='classification', overwrite_cache=False, overwrite_output_dir=True, per_gpu_eval_batch_size=8, per_gpu_train_batch_size=2, predict_languages='ar,bg,de,el,en,es,fr,hi,ru,sw,th,tr,ur,vi,zh', save_only_best_checkpoint=True, save_steps=100, seed=42, server_ip='', server_port='', task_name='xnli', test_split='test', tokenizer_name='', train_language='en', train_split='train', warmup_steps=0, weight_decay=0.0)
+08/27/2021 09:08:29 - INFO - transformers.configuration_utils -   loading configuration file https://s3.amazonaws.com/models.huggingface.co/bert/joeddav/xlm-roberta-large-xnli/config.json from cache at ../ckpt/xlm-roberta-large-xnli/feb713a8e34025aeef902ec8ff39a14eb0e15b424f824fe73e270962f7751ada.0b1c551c41092b888f61f023ebf36b8344fdb39e6fbe47d8fd9418fc6323d315
+08/27/2021 09:08:29 - INFO - transformers.configuration_utils -   Model config XLMRobertaConfig {
+  "architectures": [
+    "XLMRobertaForSequenceClassification"
+  ],
+  "attention_probs_dropout_prob": 0.1,
+  "bos_token_id": 0,
+  "do_sample": false,
+  "eos_token_id": 2,
+  "eos_token_ids": 0,
+  "finetuning_task": null,
+  "gradient_checkpointing": false,
+  "hidden_act": "gelu",
+  "hidden_dropout_prob": 0.1,
+  "hidden_size": 1024,
+  "id2label": {
+    "0": "contradiction",
+    "1": "neutral",
+    "2": "entailment"
+  },
+  "initializer_range": 0.02,
+  "intermediate_size": 4096,
+  "is_decoder": false,
+  "label2id": {
+    "contradiction": 0,
+    "entailment": 2,
+    "neutral": 1
+  },
+  "layer_norm_eps": 1e-05,
+  "length_penalty": 1.0,
+  "max_length": 20,
+  "max_position_embeddings": 514,
+  "model_type": "xlm-roberta",
+  "num_attention_heads": 16,
+  "num_beams": 1,
+  "num_hidden_layers": 24,
+  "num_labels": 2,
+  "num_return_sequences": 1,
+  "output_attentions": false,
+  "output_hidden_states": false,
+  "output_past": true,
+  "pad_token_id": 1,
+  "pruned_heads": {},
+  "repetition_penalty": 1.0,
+  "temperature": 1.0,
+  "top_k": 50,
+  "top_p": 1.0,
+  "torchscript": false,
+  "type_vocab_size": 1,
+  "use_bfloat16": false,
+  "vocab_size": 250002
+}
+
+08/27/2021 09:08:30 - INFO - transformers.modeling_utils -   loading weights file https://s3.amazonaws.com/models.huggingface.co/bert/joeddav/xlm-roberta-large-xnli/pytorch_model.bin from cache at ../ckpt/xlm-roberta-large-xnli/95c39934b2b8e19f9ca40c081b09930e9cc5d9be09cd18427baf75c7ac424964.4d084d5074217bfd3ebf97a819d18ebb9b4621fb853c9d9671e7851228b4b3b2
+Traceback (most recent call last):
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/tarfile.py", line 187, in nti
+    n = int(s.strip() or "0", 8)
+ValueError: invalid literal for int() with base 8: 's\n_rebui'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/tarfile.py", line 2289, in next
+    tarinfo = self.tarinfo.fromtarfile(self)
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/tarfile.py", line 1095, in fromtarfile
+    obj = cls.frombuf(buf, tarfile.encoding, tarfile.errors)
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/tarfile.py", line 1037, in frombuf
+    chksum = nti(buf[148:156])
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/tarfile.py", line 189, in nti
+    raise InvalidHeaderError("invalid header")
+tarfile.InvalidHeaderError: invalid header
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/site-packages/torch/serialization.py", line 595, in _load
+    return legacy_load(f)
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/site-packages/torch/serialization.py", line 506, in legacy_load
+    with closing(tarfile.open(fileobj=f, mode='r:', format=tarfile.PAX_FORMAT)) as tar, \
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/tarfile.py", line 1591, in open
+    return func(name, filemode, fileobj, **kwargs)
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/tarfile.py", line 1621, in taropen
+    return cls(name, mode, fileobj, **kwargs)
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/tarfile.py", line 1484, in __init__
+    self.firstmember = self.next()
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/tarfile.py", line 2301, in next
+    raise ReadError(str(e))
+tarfile.ReadError: invalid header
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/site-packages/transformers/modeling_utils.py", line 449, in from_pretrained
+    state_dict = torch.load(resolved_archive_file, map_location="cpu")
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/site-packages/torch/serialization.py", line 426, in load
+    return _load(f, map_location, pickle_module, **pickle_load_args)
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/site-packages/torch/serialization.py", line 599, in _load
+    raise RuntimeError("{} is a zip archive (did you mean to use torch.jit.load()?)".format(f.name))
+RuntimeError: ../ckpt/xlm-roberta-large-xnli/95c39934b2b8e19f9ca40c081b09930e9cc5d9be09cd18427baf75c7ac424964.4d084d5074217bfd3ebf97a819d18ebb9b4621fb853c9d9671e7851228b4b3b2 is a zip archive (did you mean to use torch.jit.load()?)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/work/xiaoyu/xtreme/third_party/run_classify.py", line 845, in <module>
+    main()
+  File "/home/work/xiaoyu/xtreme/third_party/run_classify.py", line 762, in main
+    cache_dir=args.cache_dir if args.cache_dir else None)
+  File "/home/work/anaconda3/envs/xtreme/lib/python3.7/site-packages/transformers/modeling_utils.py", line 452, in from_pretrained
+    "Unable to load weights from pytorch checkpoint file. "
+OSError: Unable to load weights from pytorch checkpoint file. If you tried to load a PyTorch model from a TF 2.0 checkpoint, please set from_tf=True. 

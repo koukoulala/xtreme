@@ -33,11 +33,11 @@ if [ $MODEL == "bert-base-multilingual-cased" ]; then
 elif [ $MODEL == "xlm-mlm-100-1280" ] || [ $MODEL == "xlm-mlm-tlm-xnli15-1024" ]; then
   MODEL_TYPE="xlm"
   LC=" --do_lower_case"
-elif [ $MODEL == "xlm-roberta-large" ] || [ $MODEL == "xlm-roberta-base" ]; then
+elif [ $MODEL == "xlm-roberta-large" ] || [ $MODEL == "xlm-roberta-base" ] || [ $MODEL == "joeddav/xlm-roberta-large-xnli" ]; then
   MODEL_TYPE="xlmr"
 fi
 
-if [ $MODEL == "xlm-mlm-100-1280" ] || [ $MODEL == "xlm-roberta-large" ]; then
+if [ $MODEL == "xlm-mlm-100-1280" ] || [ $MODEL == "xlm-roberta-large" ] || [ $MODEL == "joeddav/xlm-roberta-large-xnli" ]; then
   BATCH_SIZE=2
   GRAD_ACC=16
   LR=3e-5
@@ -71,4 +71,4 @@ python $PWD/third_party/run_classify.py \
   --save_only_best_checkpoint \
   --overwrite_output_dir \
   --eval_test_set $LC \
-  --cache_dir
+  --cache_dir $cache_dir
