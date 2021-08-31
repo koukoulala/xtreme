@@ -15,12 +15,12 @@
 
 REPO=$PWD
 MODEL=${1:-bert-base-multilingual-cased}
-GPU=${2:-0}
-DATA_DIR=${3:-"$REPO/download/"}
-OUT_DIR=${4:-"$REPO/outputs/"}
-cache_dir=${5:-"../ckpt/xlm-roberta-large-xnli"}
+#GPU=${2:-0}
+DATA_DIR=${2:-"$REPO/download/"}
+OUT_DIR=${3:-"$REPO/outputs/"}
+cache_dir=${4:-"../ckpt/xlm-roberta-large-xnli"}
 
-export CUDA_VISIBLE_DEVICES=$GPU
+#export CUDA_VISIBLE_DEVICES=$GPU
 
 TASK='xnli'
 LR=2e-5
@@ -33,11 +33,11 @@ if [ $MODEL == "bert-base-multilingual-cased" ]; then
 elif [ $MODEL == "xlm-mlm-100-1280" ] || [ $MODEL == "xlm-mlm-tlm-xnli15-1024" ]; then
   MODEL_TYPE="xlm"
   LC=" --do_lower_case"
-elif [ $MODEL == "xlm-roberta-large" ] || [ $MODEL == "xlm-roberta-base" ]; then
+elif [ $MODEL == "xlm-roberta-large" ] || [ $MODEL == "xlm-roberta-base" ] || [ $MODEL == "joeddav/xlm-roberta-large-xnli" ]; then
   MODEL_TYPE="xlmr"
 fi
 
-if [ $MODEL == "xlm-mlm-100-1280" ] || [ $MODEL == "xlm-roberta-large" ]; then
+if [ $MODEL == "xlm-mlm-100-1280" ] || [ $MODEL == "xlm-roberta-large" ] || [ $MODEL == "joeddav/xlm-roberta-large-xnli" ]; then
   BATCH_SIZE=2
   GRAD_ACC=16
   LR=3e-5
@@ -55,6 +55,8 @@ python $PWD/third_party/run_classify.py \
   --model_name_or_path $MODEL \
   --train_language en \
   --task_name $TASK \
+  --do_first_eval \
+  --do_train \
   --do_eval \
   --do_predict \
   --data_dir $DATA_DIR/${TASK} \
@@ -71,4 +73,4 @@ python $PWD/third_party/run_classify.py \
   --save_only_best_checkpoint \
   --overwrite_output_dir \
   --eval_test_set $LC \
-  --cache_dir
+  --cache_dir $cache_dir

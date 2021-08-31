@@ -340,10 +340,10 @@ def xnli_preprocess(args):
       with open(outfile, 'w') as fout:
         writer = csv.writer(fout, delimiter='\t')
         for (sent1, sent2, label) in pairs:
-          if split == 'test':
-            writer.writerow([sent1, sent2])
-          else:
-            writer.writerow([sent1, sent2, label])
+          #if split == 'test':
+            #writer.writerow([sent1, sent2])
+          #else:
+          writer.writerow([sent1, sent2, label])
       print(f'finish preprocess {outfile}')
 
   def _preprocess_train_file(infile, outfile):
