@@ -13,5 +13,10 @@ nohup python -u examples/pytorch/text-classification/run_xlm_roberta_xnli.py  --
 "pip install --user . && pip install --user numpy==1.20.0 && pip install -r ./examples/pytorch/summarization/requirements.txt && python -u examples/pytorch/text-classification/run_xnli_each.py  --model_name_or_path=joeddav/xlm-roberta-large-xnli  --language=en  --output_dir=[#output-model-path] --predict_file=[#input-training-data-path] --cache_dir=[#input-previous-model-path] &"
 
 nohup bash ./scripts/train_xnli.sh xlm-roberta-large 1 &> logs/try.out &
-CUDA_VISIBLE_DEVICES=1 nohup bash ./scripts/train_xnli_2.sh "joeddav/xlm-roberta-large-xnli" 1 &> logs/try_2.out &
+CUDA_VISIBLE_DEVICES=1 nohup bash ./scripts/train_xnli_2.sh joeddav/xlm-roberta-large-xnli 1 &> logs/try_2.out &
+
+"cd ../xtreme_transformer/transformers && pip install --user . && cd ../../xtreme && bash ./scripts/train_xnli_2.sh xlm-roberta-large [#input-training-data-path] [#output-model-path] [#input-previous-model-path]"
+
+# 8.30
+"cd ../xtreme_transformer/transformers && pip install --user . && cd ../../xtreme && bash ./scripts/train.sh xlm-roberta-large xnli 0 [#input-training-data-path] [#output-model-path]"
 

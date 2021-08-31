@@ -231,6 +231,8 @@ def train(args, train_dataset, model, tokenizer, lang2id=None):
           # Log metrics
           tb_writer.add_scalar("lr", scheduler.get_lr()[0], global_step)
           tb_writer.add_scalar("loss", (tr_loss - logging_loss) / args.logging_steps, global_step)
+          logger.info(" lr = {} in global_step {}".format(scheduler.get_lr()[0], global_step))
+          logger.info(" loss = {} in global_step {}".format((tr_loss - logging_loss) / args.logging_steps, global_step))
           logging_loss = tr_loss
 
           # Only evaluate on single GPU otherwise metrics may not average well
@@ -252,9 +254,12 @@ def train(args, train_dataset, model, tokenizer, lang2id=None):
                 total_correct += result['correct']
               writer.write('total={}\n'.format(total_correct / total))
 
-          if args.save_only_best_checkpoint:          
-            result = evaluate(args, model, tokenizer, split='dev', language=args.train_language, lang2id=lang2id, prefix=str(global_step))
-            logger.info(" Dev accuracy {} = {}".format(args.train_language, result['acc']))
+          if args.save_only_best_checkpoint:
+            for language in args.predict_languages.split(','):
+              result_lg = evaluate(args, model, tokenizer, split='dev', language=language, lang2id=lang2id, prefix=str(global_step))
+              logger.info(" Dev accuracy {} = {}".format(language, result_lg['acc']))
+              if language == args.train_language:
+                result = result_lg
             if result['acc'] > best_score:
               logger.info(" result['acc']={} > best_score={}".format(result['acc'], best_score))
               output_dir = os.path.join(args.output_dir, "checkpoint-best")
@@ -336,7 +341,8 @@ def evaluate(args, model, tokenizer, split='train', language='en', lang2id=None,
     preds = None
     out_label_ids = None
     sentences = None
-    for batch in tqdm(eval_dataloader, desc="Evaluating"):
+    #for batch in tqdm(eval_dataloader, desc="Evaluating"):
+    for batch in eval_dataloader:
       model.eval()
       batch = tuple(t.to(args.device) for t in batch)
 
@@ -710,6 +716,16 @@ def main():
     torch.distributed.barrier()
   logger.info("Training/evaluation parameters %s", args)
 
+  if args.do_first_eval and os.path.exists(args.cache_dir):
+    model = model_class.from_pretrained(
+      args.model_name_or_path,
+      cache_dir=args.cache_dir if args.cache_dir else None)
+
+    model.to(args.device)
+    result = evaluate(args, model, tokenizer, split='dev', language=args.train_language, lang2id=lang2id, prefix="")
+    print(result)
+
+
   # Training
   if args.do_train:
     if args.init_checkpoint:
@@ -755,15 +771,6 @@ def main():
     model = model_class.from_pretrained(args.output_dir)
     tokenizer = tokenizer_class.from_pretrained(args.output_dir)
     model.to(args.device)
-
-  if args.do_first_eval and os.path.exists(args.cache_dir):
-    model = model_class.from_pretrained(
-      args.model_name_or_path,
-      cache_dir=args.cache_dir if args.cache_dir else None)
-
-    model.to(args.device)
-    result = evaluate(args, model, tokenizer, split='dev', language=args.train_language, lang2id=lang2id, prefix="")
-    print(result)
 
 
   # Evaluation

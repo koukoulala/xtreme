@@ -15,12 +15,12 @@
 
 REPO=$PWD
 MODEL=${1:-bert-base-multilingual-cased}
-GPU=${2:-0}
-DATA_DIR=${3:-"$REPO/download/"}
-OUT_DIR=${4:-"$REPO/outputs/"}
-cache_dir=${5:-"../ckpt/xlm-roberta-large-xnli"}
+#GPU=${2:-0}
+DATA_DIR=${2:-"$REPO/download/"}
+OUT_DIR=${3:-"$REPO/outputs/"}
+cache_dir=${4:-"../ckpt/xlm-roberta-large-xnli"}
 
-export CUDA_VISIBLE_DEVICES=$GPU
+#export CUDA_VISIBLE_DEVICES=$GPU
 
 TASK='xnli'
 LR=2e-5
@@ -55,6 +55,8 @@ python $PWD/third_party/run_classify.py \
   --model_name_or_path $MODEL \
   --train_language en \
   --task_name $TASK \
+  --do_first_eval \
+  --do_train \
   --do_eval \
   --do_predict \
   --data_dir $DATA_DIR/${TASK} \
