@@ -48,6 +48,7 @@ from transformers import (
 from processors.utils import convert_examples_to_features
 from processors.xnli import XnliProcessor
 from processors.pawsx import PawsxProcessor
+from processors.ads import AdsProcessor
 
 try:
   from torch.utils.tensorboard import SummaryWriter
@@ -72,6 +73,7 @@ MODEL_CLASSES = {
 PROCESSORS = {
   'xnli': XnliProcessor,
   'pawsx': PawsxProcessor,
+  'ads': AdsProcessor,
 }
 
 
@@ -409,51 +411,26 @@ def load_and_cache_examples(args, task, tokenizer, split='train', language='en',
   processor = PROCESSORS[task]()
   output_mode = "classification"
   # Load data features from cache or dataset file
-  lc = '_lc' if args.do_lower_case else ''
-  cached_features_file = os.path.join(
-    args.data_dir,
-    "cached_{}_{}_{}_{}_{}{}".format(
-      split,
-      list(filter(None, args.model_name_or_path.split("/"))).pop(),
-      str(args.max_seq_length),
-      str(task),
-      str(language),
-      lc,
-    ),
-  )
-  if os.path.exists(cached_features_file) and not args.overwrite_cache:
-    logger.info("Loading features from cached file %s", cached_features_file)
-    features = torch.load(cached_features_file)
-  else:
-    logger.info("Creating features from dataset file at %s", args.data_dir)
-    label_list = processor.get_labels()
-    if split == 'train':
-      examples = processor.get_train_examples(args.data_dir, language)
-    elif split == 'translate-train':
-      examples = processor.get_translate_train_examples(args.data_dir, language)
-    elif split == 'translate-test':
-      examples = processor.get_translate_test_examples(args.data_dir, language)
-    elif split == 'dev':
-      examples = processor.get_dev_examples(args.data_dir, language)
-    elif split == 'pseudo_test':
-      examples = processor.get_pseudo_test_examples(args.data_dir, language)
-    else:
-      examples = processor.get_test_examples(args.data_dir, language)
+  logger.info("Creating features from dataset file at %s", args.data_dir)
 
-    features = convert_examples_to_features(
-      examples,
-      tokenizer,
-      label_list=label_list,
-      max_length=args.max_seq_length,
-      output_mode=output_mode,
-      pad_on_left=False,
-      pad_token=tokenizer.convert_tokens_to_ids([tokenizer.pad_token])[0],
-      pad_token_segment_id=0,
-      lang2id=lang2id,
-    )
-    if args.local_rank in [-1, 0]:
-      logger.info("Saving features into cached file %s", cached_features_file)
-      torch.save(features, cached_features_file)
+  label_list = processor.get_labels()
+  examples = []
+  if args.data_path.endswith(".txt"):
+    examples = processor.get_txt_examples(args.data_path, language)
+  elif args.data_path.endswith(".tsv"):
+    examples = processor.get_tsv_examples(args.data_path, language)
+
+  features = convert_examples_to_features(
+    examples,
+    tokenizer,
+    label_list=label_list,
+    max_length=args.max_seq_length,
+    output_mode=output_mode,
+    pad_on_left=False,
+    pad_token=tokenizer.convert_tokens_to_ids([tokenizer.pad_token])[0],
+    pad_token_segment_id=0,
+    lang2id=lang2id,
+  )
 
   # Make sure only the first process in distributed training process the 
   # dataset, and the others will use the cache
@@ -627,7 +604,9 @@ def main():
   parser.add_argument("--server_port", type=str, default="", help="For distant debugging.")
 
   parser.add_argument("--do_first_eval", action="store_true", help="Whether to run eval on the test set.")
-
+  parser.add_argument(
+    "--data_path", default=None, type=str, required=True, help="The input data path. Should contain the .tsv files (or other data files) for the task.",
+  )
   args = parser.parse_args()
 
   if (
