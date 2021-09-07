@@ -104,39 +104,6 @@ class XnliProcessor(DataProcessor):
         """See base class."""
         return ["contradiction", "entailment", "neutral"]
 
-    def get_tsv_examples(self, data_path, language='en'):
-        """See base class."""
-        examples = []
-        lines = self._read_tsv(data_path)
-
-        for (i, line) in enumerate(lines):
-            guid = "%s" % (i)
-            text_a = line[2]
-            text_b = line[3]
-            label = line[1]
-            assert isinstance(text_a, str) and isinstance(text_b, str) and isinstance(label, str)
-            examples.append(InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label, language=language))
-
-        label_list = ["contradiction", "entailment"]
-        return examples, label_list
-
-    def get_txt_examples(self, data_path, language='en'):
-        """See base class."""
-        examples = []
-        lines = self._read_tsv(data_path)
-
-        for (i, line) in enumerate(lines):
-            guid = "%s" % (i)
-            text_a = line[1]
-            text_b = line[2]
-            label = str(line[0].strip())
-            assert isinstance(text_a, str) and isinstance(text_b, str) and isinstance(label, str)
-            examples.append(InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label, language=language))
-
-        label_list = ["0", "1"]
-        return examples, label_list
-
-
 xnli_processors = {
     "xnli": XnliProcessor,
 }
