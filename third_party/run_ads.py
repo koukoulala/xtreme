@@ -124,14 +124,6 @@ def train(args, train_dataset, model, tokenizer, lang2id=None):
     optimizer, num_warmup_steps=args.warmup_steps, num_training_steps=t_total
   )
 
-  # Check if saved optimizer or scheduler states exist
-  if os.path.isfile(os.path.join(args.model_name_or_path, "optimizer.pt")) and os.path.isfile(
-    os.path.join(args.model_name_or_path, "scheduler.pt")
-  ):
-    # Load in optimizer and scheduler states
-    optimizer.load_state_dict(torch.load(os.path.join(args.model_name_or_path, "optimizer.pt")))
-    scheduler.load_state_dict(torch.load(os.path.join(args.model_name_or_path, "scheduler.pt")))
-
   if args.fp16:
     try:
       from apex import amp
@@ -166,17 +158,6 @@ def train(args, train_dataset, model, tokenizer, lang2id=None):
   global_step = 0
   epochs_trained = 0
   steps_trained_in_current_epoch = 0
-  # Check if continuing training from a checkpoint
-  if os.path.exists(args.model_name_or_path):
-    # set global_step to gobal_step of last saved checkpoint from model path
-    global_step = int(args.model_name_or_path.split("-")[-1].split("/")[0])
-    epochs_trained = global_step // (len(train_dataloader) // args.gradient_accumulation_steps)
-    steps_trained_in_current_epoch = global_step % (len(train_dataloader) // args.gradient_accumulation_steps)
-
-    logger.info("  Continuing training from checkpoint, will skip to saved global_step")
-    logger.info("  Continuing training from epoch %d", epochs_trained)
-    logger.info("  Continuing training from global step %d", global_step)
-    logger.info("  Will skip the first %d steps in the first epoch", steps_trained_in_current_epoch)
 
   best_score = 0
   best_checkpoint = None
@@ -281,7 +262,7 @@ def evaluate(args, model, tokenizer, eval_data_path):
     os.makedirs(args.output_dir)
 
   data_list = ["Test.uhrs_label.de.txt", "Test.uhrs_label.es.txt", "Test.uhrs_label.fr.txt",
-               "Test.uhrs_label.en.txt", "description/Test.uhrs_label.es.txt", "adsnli_test_en.tsv"]
+               "Test.uhrs_label.en.txt", "description/adsnli_dev.tsv", "adsnli_test_en.tsv"]
 
   results = {}
   for eval_each_data in data_list:

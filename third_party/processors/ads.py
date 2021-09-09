@@ -58,8 +58,8 @@ class AdsProcessor(DataProcessor):
 
         for (i, line) in enumerate(lines):
             guid = "%s" % (i)
-            text_a = line[1]
-            text_b = line[2]
+            text_a = line[2]
+            text_b = line[1]
             label = str(line[0].strip())
             if label == "0":
                 label_true = "contradiction"
