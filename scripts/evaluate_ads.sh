@@ -50,15 +50,15 @@ else
 fi 
  
 SAVE_DIR="$OUT_DIR/$TASK/${MODEL}-LR${LR}-epoch${EPOCH}-MaxLen${MAXL}/" 
-mkdir -p $SAVE_DIR 
+mkdir -p $SAVE_DIR
+
+output_file="$OUT_DIR/predictions.tsv"
  
 python $PWD/third_party/run_ads.py \
   --model_type $MODEL_TYPE \
   --model_name_or_path $model_name_or_path \
   --train_language en \
   --task_name $TASK \
-  --do_train \
-  --do_eval \
   --do_predict \
   --train_data_path $train_data_path \
   --eval_data_path $eval_data_path \
@@ -68,6 +68,8 @@ python $PWD/third_party/run_ads.py \
   --num_train_epochs $EPOCH \
   --max_seq_length $MAXL \
   --output_dir $SAVE_DIR/ \
+  --output_file $output_file \
+  --save_feature 0 \
   --save_steps 100 \
   --eval_all_checkpoints \
   --log_file 'train' \

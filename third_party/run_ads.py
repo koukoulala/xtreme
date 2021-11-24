@@ -262,12 +262,11 @@ def evaluate(args, model, tokenizer, eval_data_path):
     os.makedirs(args.output_dir)
 
   data_list = ["Test.uhrs_label.de.txt", "Test.uhrs_label.es.txt", "Test.uhrs_label.fr.txt",
-               "Test.uhrs_label.en.txt", "description/adsnli_dev.tsv", "adsnli_test_en.tsv"]
+               "Test.uhrs_label.en.txt", "adsnli_test_en.tsv", "description/adsnli_dev.tsv"]
 
   results = {}
   for eval_each_data in data_list:
-    data_path = os.path.join(eval_data_path, eval_each_data)
-    eval_dataset = load_and_cache_examples(args, args.task_name, tokenizer, data_path, evaluate=True)
+    eval_dataset = load_and_cache_examples(args, args.task_name, tokenizer, eval_each_data, evaluate=True)
 
     args.eval_batch_size = args.per_gpu_eval_batch_size * max(1, args.n_gpu)
     # Note that DistributedSampler samples randomly
@@ -329,36 +328,120 @@ def evaluate(args, model, tokenizer, eval_data_path):
 
   return results
 
+def predict(args, model, tokenizer, eval_data_path, output_file):
+  """Evalute the model."""
+  if not os.path.exists(args.output_dir) and args.local_rank in [-1, 0]:
+    os.makedirs(args.output_dir)
 
-def load_and_cache_examples(args, task, tokenizer, data_path, lang2id=None, evaluate=False):
+  eval_dataset = load_and_cache_examples(args, args.task_name, tokenizer, eval_data_path, evaluate=True)
+
+  args.eval_batch_size = args.per_gpu_eval_batch_size * max(1, args.n_gpu)
+  # Note that DistributedSampler samples randomly
+  eval_sampler = SequentialSampler(eval_dataset)
+  eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
+
+  # multi-gpu eval
+  if args.n_gpu > 1:
+    model = torch.nn.DataParallel(model)
+
+  # Eval!
+  logger.info("***** Running prediction {} *****".format(eval_data_path))
+  logger.info("  Num examples = %d", len(eval_dataset))
+  logger.info("  Batch size = %d", args.eval_batch_size)
+  nb_eval_steps = 0
+  preds = None
+  out_label_ids = None
+  sentences = None
+  #for batch in tqdm(eval_dataloader, desc="Evaluating"):
+  for batch in eval_dataloader:
+    model.eval()
+    batch = tuple(t.to(args.device) for t in batch)
+
+    with torch.no_grad():
+      inputs = {"input_ids": batch[0], "attention_mask": batch[1], "labels": batch[3]}
+      if args.model_type != "distilbert":
+        inputs["token_type_ids"] = (
+          batch[2] if args.model_type in ["bert"] else None
+        )  # XLM and DistilBERT don't use segment_ids
+      if args.model_type == "xlm":
+        inputs["langs"] = batch[4]
+      outputs = model(**inputs)
+      tmp_eval_loss, logits = outputs[:2]
+
+    nb_eval_steps += 1
+    entail_contradiction_logits = logits[:, [0, 1]]
+    # print("entail_contradiction_logits: ", entail_contradiction_logits)
+    probs = entail_contradiction_logits.softmax(dim=1)
+    if preds is None:
+      preds = probs.detach().cpu().numpy()
+      out_label_ids = inputs["labels"].detach().cpu().numpy()
+      sentences = inputs["input_ids"].detach().cpu().numpy()
+    else:
+      preds = np.append(preds, probs.detach().cpu().numpy(), axis=0)
+      out_label_ids = np.append(out_label_ids, inputs["labels"].detach().cpu().numpy(), axis=0)
+      sentences = np.append(sentences, inputs["input_ids"].detach().cpu().numpy(), axis=0)
+
+  probabilities = preds[:, [1]]
+  if args.output_mode == "classification":
+    preds = np.argmax(preds, axis=1)
+  else:
+    raise ValueError("No other `output_mode` for XNLI.")
+
+  logger.info("***** Save prediction ******")
+  with open(output_file, 'w') as fout:
+    # fout.write('id\tprobabilities\tpreds\n')
+    for id, pro, pre in zip(range(1, len(list(preds)) + 1), list(probabilities), list(preds)):
+      fout.write('{}\t{}\t{}\n'.format(id, pro[0], pre))
+
+  return
+
+def load_and_cache_examples(args, task, tokenizer, eval_each_data, lang2id=None, evaluate=False):
   # Make sure only the first process in distributed training process the 
   # dataset, and the others will use the cache
+  data_path = os.path.join(args.eval_data_path, eval_each_data)
   if args.local_rank not in [-1, 0] and not evaluate:
     torch.distributed.barrier()
 
   processor = PROCESSORS[task]()
   output_mode = "classification"
   # Load data features from cache or dataset file
-  logger.info("Creating features from dataset file at %s", data_path)
 
-  label_list = processor.get_labels()
-  examples = []
-  if data_path.endswith(".txt"):
-    examples = processor.get_txt_examples(data_path)
-  elif data_path.endswith(".tsv"):
-    examples = processor.get_tsv_examples(data_path)
-
-  features = convert_examples_to_features(
-    examples,
-    tokenizer,
-    label_list=label_list,
-    max_length=args.max_seq_length,
-    output_mode=output_mode,
-    pad_on_left=False,
-    pad_token=tokenizer.convert_tokens_to_ids([tokenizer.pad_token])[0],
-    pad_token_segment_id=0,
-    lang2id=lang2id,
+  name = data_path.split("/")[-1]
+  cached_features_file = os.path.join(
+    args.eval_data_path,
+    "cached_{}".format(name[:-4]),
   )
+  if os.path.exists(cached_features_file) and not args.overwrite_cache:
+    logger.info("Loading features from cached file %s", cached_features_file)
+    features = torch.load(cached_features_file)
+  else:
+    logger.info("Creating features from dataset file at %s", data_path)
+    label_list = processor.get_labels()
+    examples = []
+    if data_path.endswith(".txt"):
+      examples = processor.get_txt_examples(data_path)
+    elif data_path.endswith(".tsv"):
+      if evaluate == False:
+        examples = processor.get_tsv_examples(data_path, multi_lang=args.multi_lang)
+      else:
+        examples = processor.get_tsv_examples(data_path)
+    else:
+      examples = processor.get_aether_examples(data_path)
+
+    features = convert_examples_to_features(
+      examples,
+      tokenizer,
+      label_list=label_list,
+      max_length=args.max_seq_length,
+      output_mode=output_mode,
+      pad_on_left=False,
+      pad_token=tokenizer.convert_tokens_to_ids([tokenizer.pad_token])[0],
+      pad_token_segment_id=0,
+      lang2id=lang2id,
+    )
+    if args.local_rank in [-1, 0] and args.save_feature == 1:
+      logger.info("Saving features into cached file %s", cached_features_file)
+      torch.save(features, cached_features_file)
 
   # Make sure only the first process in distributed training process the 
   # dataset, and the others will use the cache
@@ -532,6 +615,9 @@ def main():
     "--eval_data_path", default=None, type=str, required=True,
     help="The input data path. Should contain the .tsv files (or other data files) for the task.",
   )
+  parser.add_argument("--multi_lang", action="store_true", help="Whether to do multi_lang train.")
+  parser.add_argument("--output_file", default=None, type=str, required=False, help="The output prediction.tsv.",)
+  parser.add_argument("--save_feature", type=int, default=1, help="save_feature")
   args = parser.parse_args()
 
   if (
@@ -625,6 +711,10 @@ def main():
   if args.local_rank == 0:
     torch.distributed.barrier()
   logger.info("Training/evaluation parameters %s", args)
+
+  if args.do_predict:
+    predict(args, model, tokenizer, args.eval_data_path, args.output_file)
+    return
 
   # first evaluation
   results = evaluate(args, model, tokenizer, args.eval_data_path)

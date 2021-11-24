@@ -22,3 +22,12 @@ CUDA_VISIBLE_DEVICES=1 nohup bash ./scripts/train_xnli_2.sh joeddav/xlm-roberta-
 
 # 9.7
 "cd ../xtreme_transformer/transformers && pip install --user . && cd ../../xtreme && bash ./scripts/train_ads.sh xlm-roberta-large 0 [#input-training-data-path]/adsnli_train_en.tsv [#input-training-data-path] [#output-model-path] [#input-previous-model-path]"
+
+# 9.7
+"cd ../xtreme_transformer/transformers && pip install --user . && cd ../../xtreme && bash ./scripts/train_ads.sh xlm-roberta-large 0 [#input-training-data-path]/adsnli_train_en_head_des.tsv [#input-training-data-path] [#output-model-path] [#input-previous-model-path]"
+
+# 9.13
+"cd ../xtreme_transformer/transformers && pip install --user . && cd ../../xtreme && bash ./scripts/train_ads.sh xlm-roberta-large 0 [#input-training-data-path]/multi_train.tsv [#input-training-data-path] [#output-model-path] [#input-previous-model-path]"
+
+# 9.26
+"cd ../xtreme_transformer/transformers && pip install --user . && cd ../../xtreme && bash ./scripts/evaluate_ads.sh xlm-roberta-large 0 [#input-training-data-path] [#input-training-data-path] [#output-model-path] [#input-previous-model-path]"
